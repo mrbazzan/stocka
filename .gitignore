@@ -1,0 +1,12 @@
+
+#IDE
+.idea/
+
+#VIRTUAL ENV
+venv/
+
+
+#COMPILED FOLDERS/FILES
+__pycache__
+*.pyc
+
