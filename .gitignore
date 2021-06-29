@@ -9,4 +9,5 @@ venv/
 #COMPILED FOLDERS/FILES
 __pycache__
 *.pyc
+pipfile.lock
 
