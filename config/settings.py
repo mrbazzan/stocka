@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'apis',
     'djoser',
     'drf_yasg',
+    'corsheaders',
 
 
 ]
@@ -60,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -193,3 +195,11 @@ AUTH_USER_MODEL = "apis.UserAccount"
 
 # Django Heroku
 django_heroku.settings(locals())
+
+# Cores
+CORS_ALLOWED_ORIGINS = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+    "http://127.0.0.1:9000"
+]
