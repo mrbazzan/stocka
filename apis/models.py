@@ -8,14 +8,14 @@ from django.db.models.fields import CharField
 
 
 class UserAccountManager(BaseUserManager):
-    def create_user(self, email, first_name, last_name, phone_number, password=None):
+    def create_user(self, email, first_name, last_name, phone_number,business_name, password=None):
         # Error for not creating an email
         if not email:
             raise ValueError('Users must have an email address')
 
         # This normalise turns the email to small caps
         email = self.normalize_email(email)
-        user = self.model(email=email, first_name=first_name,
+        user = self.model(email=email, first_name=first_name, business_name=business_name,
                           last_name=last_name, phone_number=phone_number)
 
         # Creating and using django password ashing
@@ -31,6 +31,7 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=255)
+    business_name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     last_seen = models.DateTimeField(null=True, blank=True)
@@ -40,7 +41,8 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     objects = UserAccountManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'phone_number']
+    REQUIRED_FIELDS = ['first_name', 'last_name',
+                       'phone_number', 'business_name']
 
     def get_first_name(self):
         return self.first_name

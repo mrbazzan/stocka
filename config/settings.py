@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -35,12 +36,24 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', # required for serving swagger ui's css/js files
     'rest_framework',
     'apis',
     'djoser',
+    'drf_yasg',
+
 
 ]
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS':{
+        'Auth Token eg [Bearer (JWT) ]':{
+            "type": 'apiKey',
+            "name": "Authorisation",
+            "in": "header"
+        }
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -79,20 +92,20 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'stocka',
-        'USER': 'postgres',
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'localhost'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
+
 # EMAIL
+# Stocka App Password :tovbjuypeshcsaag
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'ogtconsult21@gmail.com'
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_HOST_USER = 'zuristocka109@gmail.com'
+EMAIL_HOST_PASSWORD = 'tovbjuypeshcsaag'
+# EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = True
 
 # Password validation
@@ -177,3 +190,6 @@ DJOSER = {
 
 # Specifying my custom User model
 AUTH_USER_MODEL = "apis.UserAccount"
+
+# Django Heroku
+django_heroku.settings(locals())
