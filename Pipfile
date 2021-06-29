@@ -5,6 +5,10 @@ name = "pypi"
 
 [packages]
 django-heroku = "*"
+djangorestframework = "*"
+pyjwt = "*"
+drf-yasg = "*"
+gunicorn = "*"
 
 [dev-packages]
 
