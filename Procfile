@@ -1,5 +1,1 @@
-release: python manage.py makemigrations --no--input
-release: python manage.py migrate --no--input
-
-
-web: gunicorn config.wsgi
+web: waitress-serve --port=$PORT config.wsgi:application

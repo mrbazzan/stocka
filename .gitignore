@@ -3,11 +3,14 @@
 .idea/
 
 #VIRTUAL ENV
-
-
+venv/
 
 #COMPILED FOLDERS/FILES
 __pycache__
 *.pyc
-pipfile.lock
 
+#DATABASE
+db.sqlite3
+
+#local Procfile
+Procfile.windows

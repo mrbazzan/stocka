@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
-import django_heroku
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +21,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h%k!c0xhkkldoa)r8_vtkz3-_6tg5blz)!t986wqev+o-yw&5n'
+KEY = 'django-insecure-@ie21#r%s=-9grzcy+o*h$mu^s!9e9f)4!1&4#%p5utw$(7rs9'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', KEY)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['stocka-be.herokuapp.com', '127.0.0.1', 'localhost', 'testserver']
 
 # Application definition
 
@@ -36,19 +37,18 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles', # required for serving swagger ui's css/js files
+    'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
     'rest_framework',
     'apis',
     'djoser',
     'drf_yasg',
     'corsheaders',
 
-
 ]
 
 SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS':{
-        'Auth Token eg [Bearer (JWT) ]':{
+    'SECURITY_DEFINITIONS': {
+        'Auth Token eg [Bearer (JWT) ]': {
             "type": 'apiKey',
             "name": "Authorisation",
             "in": "header"
@@ -58,10 +58,11 @@ SWAGGER_SETTINGS = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -73,7 +74,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # Joining the vue Directory with backend
-        'DIRS': [os.path.join(BASE_DIR, 'build')],
+        'DIRS': [BASE_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -99,15 +100,15 @@ DATABASES = {
     }
 }
 
+# compress static file and creating unique names for each version, no caching.
+STATIC_FILE_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # EMAIL
-# Stocka App Password :tovbjuypeshcsaag
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'zuristocka109@gmail.com'
-EMAIL_HOST_PASSWORD = 'tovbjuypeshcsaag'
-# EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = True
 
 # Password validation
@@ -147,10 +148,7 @@ USE_TZ = False
 STATIC_URL = '/static/'
 # Static files directory
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'build/static')
-]
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # This will set the default authentication token
 REST_FRAMEWORK = {
@@ -193,13 +191,8 @@ DJOSER = {
 # Specifying my custom User model
 AUTH_USER_MODEL = "apis.UserAccount"
 
-# Django Heroku
-django_heroku.settings(locals())
+# Allow all domains to access API
+CORS_ORIGIN_ALLOW_ALL = True
 
-# Cores
-CORS_ALLOWED_ORIGINS = [
-    "https://example.com",
-    "https://sub.example.com",
-    "http://localhost:8080",
-    "http://127.0.0.1:9000"
-]
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
