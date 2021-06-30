@@ -4,6 +4,8 @@
 
 #VIRTUAL ENV
 venv/
+Pipfile
+Pipfile.lock
 
 #COMPILED FOLDERS/FILES
 __pycache__
