@@ -1,6 +1,7 @@
 
 #IDE
 .idea/
+.vscode/
 
 #VIRTUAL ENV
 venv/
@@ -16,3 +17,6 @@ db.sqlite3
 
 #local Procfile
 Procfile.windows
+
+#text files
+info.txt
