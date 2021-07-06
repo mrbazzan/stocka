@@ -35,6 +35,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 class TokenSerializer(serializers.Serializer):
 
+    id = serializers.CharField(
+        label="id",
+        read_only=True
+    )
+
     token = serializers.CharField(
         label="Token",
         read_only=True
