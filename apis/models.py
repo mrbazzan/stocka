@@ -11,6 +11,8 @@ from django.dispatch import receiver
 
 from rest_framework.authtoken.models import Token
 
+import os
+import binascii
 
 # Create your models here.
 
@@ -84,6 +86,26 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class ResetPasswordTable(models.Model):
+    email = models.EmailField(primary_key=True)
+    token = models.CharField(max_length=4)
+    created = models.DateTimeField(auto_now_add=True)
+
+    # TODO: generate a new token every 5minutes.
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = self.key_generate()
+        return super().save(*args, **kwargs)
+    
+    @classmethod
+    def key_generate(cls):
+        return binascii.hexlify(os.urandom(2)).decode()
+
+    def __str__(self):
+        return f"{self.email} --> {self.token}" 
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

@@ -1,4 +1,6 @@
+
 from django.contrib.auth import logout, authenticate
+from django.core.mail import send_mail
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -11,7 +13,7 @@ from rest_framework.views import APIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
-from .serializers import UserRegistrationSerializer, UserLoginSerializer, TokenSerializer
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, TokenSerializer, PasswordResetSerializer
 from .models import UserAccount
 
 
@@ -135,3 +137,39 @@ def authenticatedUser(request):
 
         data = {"Response": "User is not authenticated"}
         return Response(data=data, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['POST', ])
+@permission_classes([AllowAny, ])
+def reset_password(request):
+
+    user_email = request.data['email']
+
+    try:
+        user = UserAccount.objects.get(email=user_email)
+    except UserAccount.DoesNotExist:
+        return Response(
+            data={'Response': "User with Email is not registered."}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    serializer = PasswordResetSerializer(data={"email": user_email})
+
+    if serializer.is_valid():
+        new_token = serializer.save()
+        
+        send_mail(
+            "PASSWORD RESET",
+            f"""You asked for password reset for user with email `{user_email}`.
+            Copy this four(4) digit token: {new_token.token}
+            
+            Sincerely,
+            Stocka Team.
+            """,
+            'zuristocka109@gmail.com',
+            [user_email,],
+            fail_silently=False,
+        )
+        return Response(status=status.HTTP_200_OK)
+
+    return Response(serializer.errors)

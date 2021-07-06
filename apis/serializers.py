@@ -1,6 +1,6 @@
 from abc import ABC
 
-from .models import UserAccount
+from .models import UserAccount, ResetPasswordTable
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 
@@ -98,3 +98,17 @@ class UserLoginSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class PasswordResetSerializer(serializers.ModelSerializer):
+
+    email = serializers.EmailField(label="Email", required=True, write_only=True)
+
+    class Meta:
+        model = ResetPasswordTable
+        fields = ('email', 'token')
+        extra_kwargs = {"token": {"read_only": True}}
+    
+    def create(self, validated_data):
+        ResetPasswordTable.objects.create(**validated_data)
+        return super(PasswordResetSerializer, self).create(validated_data=self.validated_data)

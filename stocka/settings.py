@@ -172,3 +172,14 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
+
+# EMAIL SETTINGS
+
+# DJANGO_EMAIL=django.core.mail.backends.smtp.EmailBackend
+
+EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'zuristocka109@gmail.com'
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = True
