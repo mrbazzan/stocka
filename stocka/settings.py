@@ -61,6 +61,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'stocka.urls'
 
+AUTHENTICATION_BACKENDS = [
+
+    'apis.custom_backend.HashedPasswordAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

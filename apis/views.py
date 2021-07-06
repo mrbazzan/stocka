@@ -1,4 +1,4 @@
-from django.contrib.auth import logout
+from django.contrib.auth import logout, authenticate
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -109,3 +109,29 @@ def log_out_view(request):
     logout(request)
     data = {"Response": "Successfully logged out"}
     return Response(data=data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, ])
+def authenticatedUser(request):
+    
+    if request.method == 'POST':
+        data = {}
+        try:
+            key = Token.objects.get(key=request.data["token"])
+        except Token.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        authenticated_user = authenticate(request=request._request, email=key.user.email, password=key.user.password)
+
+        if authenticated_user:
+            data["id"] = authenticated_user.id
+            data["First Name"] = authenticated_user.first_name
+            data["Last Name"] = authenticated_user.last_name
+            data["Email"] = authenticated_user.email
+            data["Business Name"] = authenticated_user.business_name
+            data["Phone Number"] = authenticated_user.phone_number
+            return Response(data=data, status=status.HTTP_200_OK)
+
+        data = {"Response": "User is not authenticated"}
+        return Response(data=data, status=status.HTTP_401_UNAUTHORIZED)
