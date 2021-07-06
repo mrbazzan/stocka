@@ -63,6 +63,7 @@ def register_user_api_view(request):
         if serializer.is_valid():
             user = serializer.save()
             data["response"] = "Succesfully registered a new user."
+            data["id"] = user.id
             data["email"] = user.email
             data["first_name"] = user.first_name
             data["last_name"] = user.last_name
@@ -97,6 +98,7 @@ class LoginView(APIView):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         return Response({
+            'id': user.id,
             'token': token.key,
         })
 
