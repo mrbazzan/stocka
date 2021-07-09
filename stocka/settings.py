@@ -88,7 +88,7 @@ WSGI_APPLICATION = 'stocka.wsgi.application'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',),
+        'apis.authentication.BearerAuthentication',),
 }
 
 # Database
@@ -146,6 +146,8 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+# https://docs.djangoproject.com/en/1.9/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -174,8 +176,6 @@ db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
 
 # EMAIL SETTINGS
-
-# DJANGO_EMAIL=django.core.mail.backends.smtp.EmailBackend
 
 EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL', 'django.core.mail.backends.console.EmailBackend')
 EMAIL_HOST = 'smtp.gmail.com'

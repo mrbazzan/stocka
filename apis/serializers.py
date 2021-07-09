@@ -1,16 +1,22 @@
+
 from abc import ABC
 
-from .models import UserAccount, ResetPasswordTable
-from rest_framework import serializers
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import BaseUserManager
+
+from rest_framework import serializers
+from rest_framework.authtoken.models import Token
+
+from .models import UserAccount, ResetPasswordTable
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+    token = serializers.CharField(read_only=True)
 
     class Meta:
         model = UserAccount
-        fields = ('id', 'email', 'first_name', 'last_name', 'phone_number', 'business_name', 'password', 'confirm_password')
+        fields = ('token', 'id', 'email', 'first_name', 'last_name', 'phone_number', 'business_name', 'password', 'confirm_password')
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -33,17 +39,30 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 
 
-class TokenSerializer(serializers.Serializer):
+class TokenSerializer(serializers.ModelSerializer):
 
-    id = serializers.CharField(
-        label="id",
-        read_only=True
+    four_digit_token = serializers.CharField(
+        write_only=True
     )
 
-    token = serializers.CharField(
-        label="Token",
-        read_only=True
-    )
+    token = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ResetPasswordTable
+        fields = ('four_digit_token', 'token')
+        extra_kwargs = {"token": {"read_only": True}}
+    
+    def validate_four_digit_token(self, value):
+        user = ResetPasswordTable.objects.filter(token=value)
+        if not user:
+            raise serializers.ValidationError({"Response": "Wrong Four Digit Token!"})
+
+        return user.first()
+    
+    def get_token(self, obj):
+        user_associated_with_token = UserAccount.objects.get(email=obj.get('four_digit_token').email)
+        token = Token.objects.get(user_id=user_associated_with_token.id)
+        return token.key
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -100,7 +119,7 @@ class UserLoginSerializer(serializers.Serializer):
         return attrs
 
 
-class PasswordResetSerializer(serializers.ModelSerializer):
+class ResetSerializer(serializers.ModelSerializer):
 
     email = serializers.EmailField(label="Email", required=True, write_only=True)
 
@@ -108,7 +127,44 @@ class PasswordResetSerializer(serializers.ModelSerializer):
         model = ResetPasswordTable
         fields = ('email', 'token')
         extra_kwargs = {"token": {"read_only": True}}
+
+    def validate_email(self, value):
+        email_already_present = ResetPasswordTable.objects.filter(email=value)
+        if email_already_present:
+            email_already_present.delete()
+        return BaseUserManager.normalize_email(value)
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    new_password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+    confirm_password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
     
-    def create(self, validated_data):
-        ResetPasswordTable.objects.create(**validated_data)
-        return super(PasswordResetSerializer, self).create(validated_data=self.validated_data)
+    def validate(self, attrs):
+        new_password = attrs.get('new_password')
+        confirm_password = attrs.get('confirm_password')
+
+        if new_password != confirm_password:
+            raise serializers.ValidationError({'Password': "Password must match."})
+        
+        user = self.context['user']
+        user.set_password(new_password)
+        user.save()
+        return user
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        old_password = attrs.get('old_password')
+        new_password = attrs.get('new_password')
+
+        user = self.context['user']
+        if user.check_password(old_password):
+            user.set_password(new_password)      
+        else:
+            raise serializers.ValidationError({'Response': "Enter Correct Old Password."})
+
+        user.save()
+        return user

@@ -1,19 +1,26 @@
 
 from django.contrib.auth import logout, authenticate
 from django.core.mail import send_mail
+from django.urls import reverse
 
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
-
-from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
-from .serializers import UserRegistrationSerializer, UserLoginSerializer, TokenSerializer, PasswordResetSerializer
+from .serializers import (
+    UserRegistrationSerializer, 
+    UserLoginSerializer, 
+    TokenSerializer,
+    ResetSerializer,
+    PasswordResetSerializer, 
+    PasswordChangeSerializer
+)
+
 from .models import UserAccount
 
 
@@ -72,7 +79,6 @@ def register_user_api_view(request):
             data["phone_number"] = user.phone_number
             data["business_name"] = user.business_name
             data["slug"] = user.slug
-            token = Token.objects.get(user=user).key
             data["token"] = token
             return Response(data, status=status.HTTP_201_CREATED)
 
@@ -91,7 +97,7 @@ class LoginView(APIView):
                 'email or phone_number': openapi.Schema(type=openapi.TYPE_STRING, description='Email/Phone Number'),
                 'password': openapi.Schema(type=openapi.TYPE_STRING, description='Password'),
             }),
-        responses={200: TokenSerializer, 201: {}}
+        responses={200: {}, 201: {}}
     )
     def post(self, request):
         serializer = self.serializer_class(data=request.data, context={'request': request})
@@ -106,8 +112,10 @@ class LoginView(APIView):
 
 
 @api_view(['POST', ])
-@permission_classes([AllowAny, ])
+@permission_classes([IsAuthenticated, ])
 def log_out_view(request):
+    
+    request.user.auth_token.delete()
     logout(request)
     data = {"Response": "Successfully logged out"}
     return Response(data=data, status=status.HTTP_200_OK)
@@ -141,9 +149,12 @@ def authenticatedUser(request):
 
 @api_view(['POST', ])
 @permission_classes([AllowAny, ])
-def reset_password(request):
+def reset(request):
+    try:
+        user_email = request.data['email']
+    except KeyError:
+        return Response(data={'Response': "Email field is required."})
 
-    user_email = request.data['email']
 
     try:
         user = UserAccount.objects.get(email=user_email)
@@ -153,7 +164,7 @@ def reset_password(request):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    serializer = PasswordResetSerializer(data={"email": user_email})
+    serializer = ResetSerializer(data={"email": user_email})
 
     if serializer.is_valid():
         new_token = serializer.save()
@@ -161,7 +172,8 @@ def reset_password(request):
         send_mail(
             "PASSWORD RESET",
             f"""You asked for password reset for user with email `{user_email}`.
-            Copy this four(4) digit token: {new_token.token}
+            
+            Enter this four digit token: {new_token.token}
             
             Sincerely,
             Stocka Team.
@@ -173,3 +185,35 @@ def reset_password(request):
         return Response(status=status.HTTP_200_OK)
 
     return Response(serializer.errors)
+
+
+@api_view(['POST', ])
+@permission_classes([AllowAny, ])
+def confirm_email(request):
+    # receives data from user called 4-digit-token
+    serializer = TokenSerializer(data=request.data)
+
+    if serializer.is_valid(raise_exception=True):
+        return Response(data=serializer.data)
+        
+    return Response(error=serializer.errors, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST', ])
+@permission_classes([IsAuthenticated, ])
+def password_reset(request):
+
+    serializer = PasswordResetSerializer(data=request.data)
+    serializer.context['user'] = request.user
+    serializer.is_valid(raise_exception=True)
+    
+    return Response(data={"Response": "Password Reset complete!"})
+
+
+@api_view(['POST', ])
+@permission_classes([IsAuthenticated, ])
+def change_password(request):
+    serializer = PasswordChangeSerializer(data=request.data, context={'user': request.user})
+    serializer.is_valid(raise_exception=True)
+
+    return Response(data={"Response": "Password Changed!"})

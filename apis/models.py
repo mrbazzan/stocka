@@ -89,11 +89,13 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
 
 
 class ResetPasswordTable(models.Model):
-    email = models.EmailField(primary_key=True)
+    email = CIEmailField(unique=True, primary_key=True)
     token = models.CharField(max_length=4)
     created = models.DateTimeField(auto_now_add=True)
 
-    # TODO: generate a new token every 5minutes.
+    # def x(self):
+    #     return self.created > timezone.now() - datetime.timedelta(minutes=5)
+    # # TODO: generate a new token every 5minutes.
 
     def save(self, *args, **kwargs):
         if not self.token:
