@@ -13,7 +13,7 @@ Link to Front end Live Preview: https://stocka-fe-pjt-109.vercel.app
 
 
 ## BACKEND API ROUTES
-It's hosted on → [STOCKA-BE](https://stocka-be.herokuapp.com/)
+It's hosted on → [STOCKA-BE](https://stocka-be.herokuapp.com/).
 
 
 - ### AUTHENTICATION API
