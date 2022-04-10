@@ -1,22 +1,22 @@
 
-# Stocka inventory management solution
+# STOCKA: An Inventory Management Platform.
 
-Stocka is an inventory management solution that is created for wholesalers and retailers, and it's sole purpose is to help these businesses keep tabs on their stock items, while achieving their goal of making profits.
+Stocka is an inventory management solution that is created for wholesalers and retailers, and its sole purpose is to help businesses keep tabs on their stock items while achieving their goal of making profits.
 
 The system accepts inventory movement reports (transactions) and maintains a continuous record of the quantity on-hand.
 
 Stocka will be made available on websites and mobile apps. 
 
 
-## FRONT-END PREVIEW
+#### FRONT-END PREVIEW
 Link to Front end Live Preview: https://stocka-fe-pjt-109.vercel.app
 
 
-## BACKEND API ROUTES
+#### BACKEND API ROUTES
 It's hosted on → [STOCKA-BE](https://stocka-be.herokuapp.com/).
 
 
-- ### AUTHENTICATION API
+##### AUTHENTICATION API
 
 ``GET`` /auth/user/
 - Get all Users. Only the Admin has access to this information.
@@ -26,7 +26,7 @@ It's hosted on → [STOCKA-BE](https://stocka-be.herokuapp.com/).
 
 ``GET`` /auth/user/{id}/
 - Get User with specific id. Only the Specific User and Admin has access to this information.
-#### PARAMETERS
+###### PARAMETERS
 - id: string
 - example: 1
 The ID of the element. It is required.
@@ -34,7 +34,7 @@ The ID of the element. It is required.
 
 ``POST`` /auth/user/me/
 - Returns an authenticated user.
-#### PARAMETERS
+###### PARAMETERS
 - ``token`` is required.
 - BODY:
     {
@@ -44,9 +44,10 @@ The ID of the element. It is required.
 
 ``POST`` /auth/user/register/
 - This is the endpoint to register an account.
-#### PARAMETERS
-- ##### REQUIRED FIELDS: email, first_name, last_name, phone_number, password, confirm_password
+###### PARAMETERS
+- REQUIRED FIELDS: email, first_name, last_name, phone_number, password, confirm_password
 - BODY:
+```json
     {
         "email": "user@example.com",
         "first_name": "string",
@@ -56,72 +57,80 @@ The ID of the element. It is required.
         "password": "string",
         "confirm_password": "string"
     }
-
+```
 
 ``POST`` /auth/user/login/
 - Login a user.
-#### PARAMETERS
+###### PARAMETERS
 - One of ``Email`` or ``Phone Number`` required.
 - ``Password`` is required.
 - BODY:
+```json
     {
         "email or phone_number": "string",
         "password": "string"
     }
+```
 
 
 ``POST`` /auth/user/logout/
 - Logout a user.
-#### PARAMETERS
+###### PARAMETERS
 - It takes no parameter.
 
 
 ``POST`` /auth/user/reset_password/
 - Send an email containing the four digit token needed to reset password
-#### PARAMETERS
+###### PARAMETERS
 - ``Email`` is required.
 - BODY:
+```json
     {
         "email": "string", 
     }
+```
 
 
 ``POST`` /auth/user/password_reset_token/
 - Endpoint for a user to input the four digit token received via email.
-#### PARAMETERS
+###### PARAMETERS
 - ``four_digit_token`` is required.
 - BODY:
+```json
     {
         "four_digit_token": "string", 
     }
+```
 
 
 ``POST`` /auth/user/reset_confirm/
 - Reset a user's password.
-#### PARAMETERS
+###### PARAMETERS
 - ``new_password`` is required.
 - ``confirm_password`` is required.
 - BODY:
+```json
     {
         "new_password": "string",
         "confirm_password": "string"
     }
-
+```
 
 ``POST`` /auth/user/change_password/
 - Change a user's password.
-#### PARAMETERS
+###### PARAMETERS
 - ``old_password`` is required.
 - ``new_password`` is required.
 - BODY:
+```json
     {
         "new_password": "string",
         "old_password": "string"
     }
+```
 
 
-
-## HOW TO SET IT UP LOCALLY(On Windows)
+#### HOW TO SET IT UP LOCALLY(On Windows)
 PS: This step-by-step information is for the backend team
 
 - Clone the repository
