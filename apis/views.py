@@ -188,7 +188,7 @@ def reset(request):
             [user_email,],
             fail_silently=False,
         )
-        return Response(status=status.HTTP_200_OK)
+        return Response(data={"data": "Password sent to mail"}, status=status.HTTP_200_OK)
 
     return Response(serializer.errors)
 
