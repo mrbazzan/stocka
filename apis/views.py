@@ -127,9 +127,14 @@ def log_out_view(request):
 def authenticatedUser(request):
     
     if request.method == 'POST':
+        try:
+            token_key = request.data["token"]
+        except KeyError:
+            return Response(data={'Response': 'Token key is required'},
+                    status=status.HTTP_404_NOT_FOUND)
         data = {}
         try:
-            key = Token.objects.get(key=request.data["token"])
+            key = Token.objects.get(key=token_key)
         except Token.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
