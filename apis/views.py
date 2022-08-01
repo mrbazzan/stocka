@@ -22,6 +22,7 @@ from .serializers import (
 )
 
 from .models import UserAccount
+from rest_framework.authtoken.models import Token
 
 
 # Create your views here.
@@ -79,7 +80,7 @@ def register_user_api_view(request):
             data["phone_number"] = user.phone_number
             data["business_name"] = user.business_name
             data["slug"] = user.slug
-            data["token"] = token
+            data["token"] = Token.objects.get(user=user).key
             return Response(data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
