@@ -199,3 +199,9 @@ The RDBMS is PostgreSQL. Create a database called `stocka` with `postgres` as th
      
     python manage.py runserver
     ```
+
+### Running Tests
+- Activate virtual environment if it's not activated. Then run,
+  ```python
+  python manage.py test
+  ```
