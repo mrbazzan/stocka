@@ -100,8 +100,10 @@ DATABASES = {
         'USER': 'postgres',
         'NAME': 'stocka',
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'localhost'
-        # TODO: Add `test` later ...
+        'HOST': 'localhost',
+        'TEST': {
+            'NAME': 'test_stocka',
+        },
     }
 }
 
