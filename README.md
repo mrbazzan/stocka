@@ -78,7 +78,7 @@ Stocka will be made available on websites and mobile apps.
 
 - 
   - **Endpoint** ``POST`` `/auth/user/logout/`
-  - Logout a user.
+  - Logout a user. This deletes the token associated with the user.
     - **fields**: It takes no parameter.
 
 
