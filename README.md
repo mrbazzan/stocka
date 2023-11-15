@@ -11,6 +11,7 @@ Stocka will be made available on websites and mobile apps.
 #### BACKEND API
 - The API routes are hosted on [->](https://stocka-be.herokuapp.com/).
 
+note - site was hosted on heroku's free plan which has since been cancelled
 
 ##### AUTHENTICATION API
 
